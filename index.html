@@ -23,42 +23,49 @@
 			border-radius: 4px;
 			background: #222;
 			}
-		.joystick {
+		.side {
 			position: absolute;
 			bottom: 20px;
+			font-weight: bold;
 			}
-		.joystick.left  { color: #afa; left: 20px; }
-		.joystick.right { color: #aaf; right: 20px; }
+		.left  { color: #afa; left: 20px; }
+		.right { color: #aaf; right: 20px; }
+		.joystick {
+			margin-top: 25px;
+		}
 	</style>
 	<script>
-	function main() {
+	window.onload = function() {
+
+		var jq_dataSpan = $("#container .data");
+
+		function setCoord(x, y, rx, ry, side) {
+			function f(v, ind) {
+				var vs = v.toString();
+				vs = vs.substr(0, 4 + (vs[0] === "-"));
+				jq_dataSpan.eq(ind).text(vs);
+			}
+			f( x, 0 + side * 4);
+			f( y, 1 + side * 4);
+			f(rx, 2 + side * 4);
+			f(ry, 3 + side * 4);
+		}
 
 		new joystick({
-			element: document.querySelectorAll(".joystick.left"),
-			move: function(x, y) {
-				lg("left: move("+
-					  "x:"+x+
-					", y:"+y+
-				")");
-			},
-			hold:    function() { lg("left: hold()"); },
-			release: function() { lg("left: release()"); }
+			element: document.querySelector(".left .joystick"),
+			move:    function(x, y, rx, ry) { setCoord(x, y, rx, ry, 0); },
+			hold:    function() { setCoord(0, 0, 0, 0, 0); },
+			release: function() { setCoord(0, 0, 0, 0, 0); },
 		});
 
 		new joystick({
-			element: document.querySelectorAll(".joystick.right"),
-			move: function(x, y) {
-				lg("right: move("+
-					  "x:"+x+
-					", y:"+y+
-				")");
-			},
-			hold:    function() { lg("right: hold()"); },
-			release: function() { lg("right: release()"); }
+			element: document.querySelector(".right .joystick"),
+			move:    function(x, y, rx, ry) { setCoord(x, y, rx, ry, 1); },
+			hold:    function() { setCoord(0, 0, 0, 0, 1); },
+			release: function() { setCoord(0, 0, 0, 0, 1); },
 		});
 
 	}
-	window.onload = main;
 	</script>
 </head>
 <body>
@@ -69,8 +76,20 @@
 	</div>
 
 	<div id="container">
-		<div class="joystick left"></div>
-		<div class="joystick right"></div>
+		<div class="side left">
+			x: <span class="data"></span><br/>
+			y: <span class="data"></span><br/>
+			rx: <span class="data"></span><br/>
+			ry: <span class="data"></span><br/>
+			<div class="joystick"></div>
+		</div>
+		<div class="side right">
+			x: <span class="data"></span><br/>
+			y: <span class="data"></span><br/>
+			rx: <span class="data"></span><br/>
+			ry: <span class="data"></span><br/>
+			<div class="joystick"></div>
+		</div>
 	</div>
 
 </body>
