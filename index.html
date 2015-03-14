@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Joystick - HTML5</title>
+	<meta charset="UTF-8"/>
+	<meta name="viewport" content="width=device-width, user-scalable=no"/>
+	<meta property="og:title"       content="Joystick - HTML5"/>
+	<meta property="og:url"         content="https://mr21.github.io/joystick-html5/"/>
+	<meta property="og:image"       content="https://mr21.github.io/joystick-html5/thumbnail.jpg"/>
+	<meta property="og:description" content="A tiny joystick controller for mobile purpose."/>
+	<link rel="stylesheet" href="/_/fa/css/font-awesome.min.css"/>
+	<link rel="stylesheet" href="/_/header.css"/>
+	<link rel="stylesheet" href="joystick.css"/>
+	<script src="/_/jquery.min.js"></script>
+	<script src="/_/header.js"></script>
+	<script src="joystick.js"></script>
+	<style>
+		#container {
+			position: relative;
+			margin: 35px auto;
+			width: 450px;
+			height: 250px;
+			border-radius: 4px;
+			background: #222;
+			}
+		.joystick {
+			position: absolute;
+			bottom: 20px;
+			}
+		.joystick.left  { color: #afa; left: 20px; }
+		.joystick.right { color: #aaf; right: 20px; }
+	</style>
+	<script>
+	function main() {
+
+		new joystick({
+			element: document.querySelectorAll(".joystick.left"),
+			move: function(x, y) {
+				lg("left: move("+
+					  "x:"+x+
+					", y:"+y+
+				")");
+			},
+			hold:    function() { lg("left: hold()"); },
+			release: function() { lg("left: release()"); }
+		});
+
+		new joystick({
+			element: document.querySelectorAll(".joystick.right"),
+			move: function(x, y) {
+				lg("right: move("+
+					  "x:"+x+
+					", y:"+y+
+				")");
+			},
+			hold:    function() { lg("right: hold()"); },
+			release: function() { lg("right: release()"); }
+		});
+
+	}
+	window.onload = main;
+	</script>
+</head>
+<body>
+
+	<div id="header">
+		<i class="fa fa-fw fa-gamepad"></i>
+		<h1>Joystick-HTML5 - 1.0</h1>
+	</div>
+
+	<div id="container">
+		<div class="joystick left"></div>
+		<div class="joystick right"></div>
+	</div>
+
+</body>
+</html>
