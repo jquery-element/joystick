@@ -33,6 +33,7 @@
 		}
 	.joystick:before {
 		content: "";
+		box-sizing: content-box;
 		margin: -7px;
 		border: 2px dashed;
 		padding: 5px;
