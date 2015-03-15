@@ -19,11 +19,7 @@ function joystick(p) {
 		coordY,
 		btnCoordX = 0,
 		btnCoordY = 0,
-		// callbacks
-		noop = function() {},
-		move = p.move || noop,
-		hold = p.hold || noop,
-		release = p.release || noop,
+		// utils
 		attachEvent = function(e, v, f) {
 			if (e.attachEvent)
 				e.attachEvent("on" + v, f);
@@ -42,6 +38,11 @@ function joystick(p) {
 				if (t.identifier === identifier)
 					return t;
 		},
+		// callbacks
+		noop = function() {},
+		move = p.move || noop,
+		hold = p.hold || noop,
+		release = p.release || noop,
 		fn_hold = function(e, isTactile) {
 			var pos = e;
 			if (isTactile) {
@@ -113,11 +114,14 @@ function joystick(p) {
 
 	el_ctn.appendChild(el_btn);
 
-	attachEvent(el_ctn, "mousedown",  function(e) { fn_hold(e, 0); });
-	attachEvent(el_ctn, "touchstart", function(e) { fn_hold(e, 1); });
-	attachEvent(window, "mouseup",    function(e) { fn_release(e, 0); });
-	attachEvent(window, "touchend",   function(e) { fn_release(e, 1); });
-	attachEvent(window, "mousemove",  function(e) { fn_move(e, 0); });
-	attachEvent(window, "touchmove",  function(e) { fn_move(e, 1); });
+	if (window.ontouchmove === null) {
+		attachEvent(el_ctn, "touchstart", function(e) { fn_hold(e, 1); });
+		attachEvent(window, "touchend",   function(e) { fn_release(e, 1); });
+		attachEvent(window, "touchmove",  function(e) { fn_move(e, 1); });
+	} else {
+		attachEvent(el_ctn, "mousedown", fn_hold);
+		attachEvent(window, "mouseup",   fn_release);
+		attachEvent(window, "mousemove", fn_move);
+	}
 
 }
