@@ -11,7 +11,6 @@
 	<link rel="stylesheet" href="/_/fa/css/font-awesome.min.css"/>
 	<link rel="stylesheet" href="/_/header.css"/>
 	<link rel="stylesheet" href="joystick.css"/>
-	<script src="/_/jquery.min.js"></script>
 	<script src="/_/header.js"></script>
 	<script src="joystick.js"></script>
 	<style>
@@ -37,13 +36,13 @@
 	<script>
 	window.onload = function() {
 
-		var jq_dataSpan = $("#container .data");
+		var el_dataSpan = document.querySelectorAll("#container .data");
 
 		function setCoord(x, y, rx, ry, side) {
 			function f(v, ind) {
 				var vs = v.toString();
 				vs = vs.substr(0, 4 + (vs[0] === "-"));
-				jq_dataSpan.eq(ind).text(vs);
+				el_dataSpan[ind].textContent = vs;
 			}
 			f( x, 0 + side * 4);
 			f( y, 1 + side * 4);
