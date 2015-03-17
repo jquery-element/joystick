@@ -1,5 +1,5 @@
 /*
-	Joystick-HTML5 - 1.0
+	Joystick-HTML5 - 1.1
 	https://github.com/Mr21/joystick-html5
 */
 
@@ -52,7 +52,7 @@
 			move = p.move || noop,
 			hold = p.hold || noop,
 			release = p.release || noop,
-			fn_hold = function(e, isTactile) {
+			ev_hold = function(e, isTactile) {
 				var pos = e;
 				if (isTactile) {
 					var t, i = 0;
@@ -64,6 +64,8 @@
 					pos = t;
 					identifier = t.identifier;
 				}
+				btnCoordX = 0;
+				btnCoordY = 0;
 				e.preventDefault();
 				coordX = pos.pageX;
 				coordY = pos.pageY;
@@ -72,18 +74,35 @@
 				addClass(el_ctn, "joystick-show");
 				hold.call(el_ctn);
 			},
-			fn_release = function(e, isTactile) {
+			moveBtn = function(x, y, rx, ry) {
+				el_btn.style.marginLeft = x + "px";
+				el_btn.style.marginTop  = y + "px";
+				move.call(
+					el_ctn,
+					x / radius,
+					y / radius,
+					rx,
+					ry
+				);
+			},
+			ev_release = function(e, isTactile) {
 				if (isHolding && (!isTactile || searchTouch(e))) {
 					e.preventDefault();
 					isHolding = false;
 					removeClass(el_ctn, "joystick-show");
 					addClass(el_ctn, "joystick-reset");
-					el_btn.style.marginLeft = (btnCoordX = 0) + "px";
-					el_btn.style.marginTop  = (btnCoordY = 0) + "px";
+					el_btn.style.marginLeft = "0px";
+					el_btn.style.marginTop  = "0px";
+					moveBtn(
+						0,
+						0,
+						-btnCoordX,
+						-btnCoordY
+					);
 					release.call(el_ctn);
 				}
 			},
-			fn_move = function(e, isTactile) {
+			ev_move = function(e, isTactile) {
 				if (isHolding) {
 					var	x, y, a, d, rx, ry,
 						pos = e;
@@ -96,18 +115,13 @@
 					coordY = pos.pageY;
 					x = (btnCoordX += rx);
 					y = (btnCoordY += ry);
-					a = Math.atan2(y, x);
 					d = Math.sqrt(x * x + y * y);
 					if (d > radius)
 						d = radius;
-					x = Math.cos(a) * d;
-					y = Math.sin(a) * d;
-					el_btn.style.marginLeft = x + "px";
-					el_btn.style.marginTop  = y + "px";
-					move.call(
-						el_ctn,
-						x / radius,
-						y / radius,
+					a = Math.atan2(y, x);
+					moveBtn(
+						Math.cos(a) * d,
+						Math.sin(a) * d,
 						rx,
 						ry
 					);
@@ -118,13 +132,13 @@
 		el_ctn.appendChild(el_btn);
 
 		if (window.ontouchmove === null) {
-			attachEvent(el_ctn, "touchstart", function(e) { fn_hold(e, 1); });
-			attachEvent(window, "touchend",   function(e) { fn_release(e, 1); });
-			attachEvent(window, "touchmove",  function(e) { fn_move(e, 1); });
+			attachEvent(el_ctn, "touchstart", function(e) { ev_hold(e, 1); });
+			attachEvent(window, "touchend",   function(e) { ev_release(e, 1); });
+			attachEvent(window, "touchmove",  function(e) { ev_move(e, 1); });
 		} else {
-			attachEvent(el_ctn, "mousedown", fn_hold);
-			attachEvent(window, "mouseup",   fn_release);
-			attachEvent(window, "mousemove", fn_move);
+			attachEvent(el_ctn, "mousedown", ev_hold);
+			attachEvent(window, "mouseup",   ev_release);
+			attachEvent(window, "mousemove", ev_move);
 		}
 
 	};
