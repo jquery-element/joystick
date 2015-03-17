@@ -1,5 +1,5 @@
 /*
-	Joystick-HTML5 - 1.0
+	Joystick-HTML5 - 1.1
 	https://github.com/Mr21/joystick-html5
 */
 
@@ -18,7 +18,7 @@
 	.joystick * {
 		box-sizing: border-box;
 		}
-	.joystick-show {
+	.joystick.joystick-show {
 		transition-duration: .2s;
 		opacity: 1;
 		}
@@ -46,10 +46,10 @@
 		transition-duration: inherit;
 		transition-timing-function: inherit;
 		}
-		.joystick-show * {
+		.joystick.joystick-show * {
 			border-width: 5px;
 			}
-		.joystick-reset * {
+		.joystick.joystick-reset * {
 			transition-property: border-width, margin;
 			transition-duration: .1s;
 			}
