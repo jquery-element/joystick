@@ -29,7 +29,7 @@
 		this.identifier;
 		this.coordX;
 		this.coordY;
-		this.btnCoordX = 0;
+		this.btnCoordX =
 		this.btnCoordY = 0;
 
 		var
@@ -134,21 +134,15 @@
 			}
 		;
 
-		this.jqCtn.append( this.jqBtn );
+		this.jqCtn
+			.append( this.jqBtn )
+			.on( isTactile ? "touchstart" : "mousedown", ev_hold )
+		;
 
-		if ( isTactile ) {
-			this.jqCtn.on( "touchstart", ev_hold );
-			jqWindow
-				.on( "touchend", ev_release )
-				.on( "touchmove", ev_move )
-			;
-		} else {
-			this.jqCtn.mousedown( ev_hold );
-			jqWindow
-				.mouseup( ev_release )
-				.mousemove( ev_move )
-			;
-		}
+		jqWindow
+			.on( isTactile ? "touchend" : "mouseup", ev_release )
+			.on( isTactile ? "touchmove" : "mousemove", ev_move )
+		;
 
 	};
 
