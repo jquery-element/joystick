@@ -3,18 +3,13 @@
 	https://github.com/Mr21/joystick-html5
 */
 
-/*
-	This script has not the good conception right now.
-	There is a window.ontouchmove for each joystick created...
-	I'll change this after, meanwhile it's works.
-*/
-
 "use strict";
 
 (function() {
 
 	var
-		jqWindow = $( window )
+		jqWindow = $( window ),
+		isTactile = window.ontouchstart === null
 	;
 
 	window.joystick = function( p ) {
@@ -44,7 +39,7 @@
 			move = p.move || $.noop,
 			hold = p.hold || $.noop,
 			release = p.release || $.noop,
-			ev_hold = function( e, isTactile ) {
+			ev_hold = function( e ) {
 				var t, i = 0, pos = e;
 				if ( isTactile ) {
 					while ( t = e.changedTouches[ i++ ] ) {
@@ -83,7 +78,7 @@
 					ry
 				);
 			},
-			ev_release = function( e, isTactile ) {
+			ev_release = function( e ) {
 				if ( isHolding && ( !isTactile || searchTouch( e ) ) ) {
 					e.preventDefault();
 					isHolding = false;
@@ -104,7 +99,7 @@
 					release.call( jqCtn[ 0 ] );
 				}
 			},
-			ev_move = function( e, isTactile ) {
+			ev_move = function( e ) {
 				if ( isHolding ) {
 					var
 						x, y, a, d, rx, ry,
@@ -137,11 +132,11 @@
 
 		jqCtn.append( jqBtn );
 
-		if ( window.ontouchmove === null ) {
-			jqCtn.on( "touchstart", function( e ) { ev_hold( e, 1 ); } );
+		if ( isTactile ) {
+			jqCtn.on( "touchstart", ev_hold );
 			jqWindow
-				.on( "touchend", function( e ) { ev_release( e, 1 ); } )
-				.on( "touchmove", function( e ) { ev_move( e, 1 ); } )
+				.on( "touchend", ev_release )
+				.on( "touchmove", ev_move )
 			;
 		} else {
 			jqCtn.mousedown( ev_hold );
