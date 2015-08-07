@@ -13,31 +13,19 @@
 
 (function() {
 
-	// utils
-	function noop() {}
-	function attachEvent( e, v, f ) {
-		if ( e.attachEvent ) {
-			e.attachEvent( "on" + v, f );
-		} else {
-			e.addEventListener( v, f, false );
-		}
-	}
-	function addClass( e, c ) {
-		e.className += " " + c;
-	}
-	function removeClass( e, c ) {
-		e.className = e.className.replace( new RegExp( " " + c, "g" ), "" );
-	}
+	var
+		jqWindow = $( window )
+	;
 
 	window.joystick = function( p ) {
 
 		var
 			// dom
-			el_ctn = p.element.nodeType === Node.ELEMENT_NODE ? p.element : p.element[ 0 ],
-			el_btn = document.createElement( "div" ),
+			jqCtn = $( p.element.nodeType === 1 ? p.element : p.element[ 0 ] ),
+			jqBtn = $( "<div>" ),
 			// attr
 			identifier,
-			radius = el_ctn.offsetWidth / 2,
+			radius = jqCtn.width() / 2,
 			isHolding = false,
 			coordX,
 			coordY,
@@ -53,14 +41,14 @@
 				}
 			},
 			// callbacks
-			move = p.move || noop,
-			hold = p.hold || noop,
-			release = p.release || noop,
+			move = p.move || $.noop,
+			hold = p.hold || $.noop,
+			release = p.release || $.noop,
 			ev_hold = function( e, isTactile ) {
 				var t, i = 0, pos = e;
 				if ( isTactile ) {
 					while ( t = e.changedTouches[ i++ ] ) {
-						if ( t.target === el_ctn || t.target === el_btn ) {
+						if ( t.target === jqCtn[ 0 ] || t.target === jqBtn[ 0 ] ) {
 							break;
 						}
 					}
@@ -76,15 +64,19 @@
 				coordX = pos.pageX;
 				coordY = pos.pageY;
 				isHolding = true;
-				removeClass( el_ctn, "joystick-reset" );
-				addClass( el_ctn, "joystick-show" );
-				hold.call( el_ctn );
+				jqCtn
+					.removeClass( "joystick-reset" )
+					.addClass( "joystick-show" )
+				;
+				hold.call( jqCtn[ 0 ] );
 			},
 			moveBtn = function( x, y, rx, ry ) {
-				el_btn.style.marginLeft = x + "px";
-				el_btn.style.marginTop  = y + "px";
+				jqBtn.css({
+					marginLeft: x,
+					marginTop: y,
+				});
 				move.call(
-					el_ctn,
+					jqCtn[ 0 ],
 					x / radius,
 					y / radius,
 					rx,
@@ -95,17 +87,21 @@
 				if ( isHolding && ( !isTactile || searchTouch( e ) ) ) {
 					e.preventDefault();
 					isHolding = false;
-					removeClass( el_ctn, "joystick-show" );
-					addClass( el_ctn, "joystick-reset" );
-					el_btn.style.marginLeft =
-					el_btn.style.marginTop  = "0px";
+					jqCtn
+						.removeClass( "joystick-show" )
+						.addClass( "joystick-reset" )
+					;
+					jqBtn.css({
+						marginLeft: 0,
+						marginTop: 0
+					});
 					moveBtn(
 						0,
 						0,
 						-btnCoordX,
 						-btnCoordY
 					);
-					release.call( el_ctn );
+					release.call( jqCtn[ 0 ] );
 				}
 			},
 			ev_move = function( e, isTactile ) {
@@ -139,16 +135,20 @@
 			}
 		;
 
-		el_ctn.appendChild( el_btn );
+		jqCtn.append( jqBtn );
 
 		if ( window.ontouchmove === null ) {
-			attachEvent( el_ctn, "touchstart", function( e ) { ev_hold( e, 1 ); } );
-			attachEvent( window, "touchend",   function( e ) { ev_release( e, 1 ); } );
-			attachEvent( window, "touchmove",  function( e ) { ev_move( e, 1 ); } );
+			jqCtn.on( "touchstart", function( e ) { ev_hold( e, 1 ); } );
+			jqWindow
+				.on( "touchend", function( e ) { ev_release( e, 1 ); } )
+				.on( "touchmove", function( e ) { ev_move( e, 1 ); } )
+			;
 		} else {
-			attachEvent( el_ctn, "mousedown", ev_hold );
-			attachEvent( window, "mouseup",   ev_release );
-			attachEvent( window, "mousemove", ev_move );
+			jqCtn.mousedown( ev_hold );
+			jqWindow
+				.mouseup( ev_release )
+				.mousemove( ev_move )
+			;
 		}
 
 	};
