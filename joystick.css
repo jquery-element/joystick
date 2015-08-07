@@ -1,5 +1,5 @@
 /*
-	Joystick-HTML5 - 1.1
+	Joystick-HTML5 - 1.1.0
 	https://github.com/Mr21/joystick-html5
 */
 
