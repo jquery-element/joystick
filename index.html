@@ -54,14 +54,14 @@
 			element: document.querySelector(".left .joystick"),
 			move:    function(x, y, rx, ry) { setCoord(x, y, rx, ry, 0); },
 			hold:    function() { setCoord(0, 0, 0, 0, 0); },
-			release: function() { setCoord(0, 0, 0, 0, 0); },
+			release: function() { setCoord(0, 0, 0, 0, 0); }
 		});
 
 		new joystick({
 			element: document.querySelector(".right .joystick"),
 			move:    function(x, y, rx, ry) { setCoord(x, y, rx, ry, 1); },
 			hold:    function() { setCoord(0, 0, 0, 0, 1); },
-			release: function() { setCoord(0, 0, 0, 0, 1); },
+			release: function() { setCoord(0, 0, 0, 0, 1); }
 		});
 
 	}
@@ -71,7 +71,7 @@
 
 	<div id="header">
 		<i class="fa fa-fw fa-gamepad"></i>
-		<h1>Joystick-HTML5 - 1.0</h1>
+		<h1>joystick-html5</h1>
 	</div>
 
 	<div id="container">
