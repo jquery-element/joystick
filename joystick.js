@@ -14,36 +14,40 @@
 
 	window.joystick = function( p ) {
 
+		// User's callbacks
+		this.move    = p.move    || $.noop;
+		this.hold    = p.hold    || $.noop;
+		this.release = p.release || $.noop;
+
+		// jQuery elements
+		this.jqCtn = $( p.element.nodeType === 1 ? p.element : p.element[ 0 ] );
+		this.jqBtn = $( "<div>" );
+
+		// Attributes
+		this.radius = this.jqCtn.width() / 2;
+		this.isHolding = false;
+		this.identifier;
+		this.coordX;
+		this.coordY;
+		this.btnCoordX = 0;
+		this.btnCoordY = 0;
+
 		var
-			// dom
-			jqCtn = $( p.element.nodeType === 1 ? p.element : p.element[ 0 ] ),
-			jqBtn = $( "<div>" ),
-			// attr
-			identifier,
-			radius = jqCtn.width() / 2,
-			isHolding = false,
-			coordX,
-			coordY,
-			btnCoordX = 0,
-			btnCoordY = 0,
+			that = this,
 			searchTouch = function( e ) {
 				var t, i = 0;
 				e = e.changedTouches;
 				for ( ; t = e[ i ]; ++i ) {
-					if ( t.identifier === identifier ) {
+					if ( t.identifier === that.identifier ) {
 						return t;
 					}
 				}
 			},
-			// callbacks
-			move = p.move || $.noop,
-			hold = p.hold || $.noop,
-			release = p.release || $.noop,
 			ev_hold = function( e ) {
 				var t, i = 0, pos = e;
 				if ( isTactile ) {
 					while ( t = e.changedTouches[ i++ ] ) {
-						if ( t.target === jqCtn[ 0 ] || t.target === jqBtn[ 0 ] ) {
+						if ( t.target === that.jqCtn[ 0 ] || t.target === that.jqBtn[ 0 ] ) {
 							break;
 						}
 					}
@@ -51,56 +55,56 @@
 						return;
 					}
 					pos = t;
-					identifier = t.identifier;
+					that.identifier = t.identifier;
 				}
-				btnCoordX = 0;
-				btnCoordY = 0;
+				that.btnCoordX = 0;
+				that.btnCoordY = 0;
 				e.preventDefault();
-				coordX = pos.pageX;
-				coordY = pos.pageY;
-				isHolding = true;
-				jqCtn
+				that.coordX = pos.pageX;
+				that.coordY = pos.pageY;
+				that.isHolding = true;
+				that.jqCtn
 					.removeClass( "joystick-reset" )
 					.addClass( "joystick-show" )
 				;
-				hold.call( jqCtn[ 0 ] );
+				that.hold.call( that.jqCtn[ 0 ] );
 			},
 			moveBtn = function( x, y, rx, ry ) {
-				jqBtn.css({
+				that.jqBtn.css({
 					marginLeft: x,
 					marginTop: y,
 				});
-				move.call(
-					jqCtn[ 0 ],
-					x / radius,
-					y / radius,
+				that.move.call(
+					that.jqCtn[ 0 ],
+					x / that.radius,
+					y / that.radius,
 					rx,
 					ry
 				);
 			},
 			ev_release = function( e ) {
-				if ( isHolding && ( !isTactile || searchTouch( e ) ) ) {
+				if ( that.isHolding && ( !isTactile || searchTouch( e ) ) ) {
 					e.preventDefault();
-					isHolding = false;
-					jqCtn
+					that.isHolding = false;
+					that.jqCtn
 						.removeClass( "joystick-show" )
 						.addClass( "joystick-reset" )
 					;
-					jqBtn.css({
+					that.jqBtn.css({
 						marginLeft: 0,
 						marginTop: 0
 					});
 					moveBtn(
 						0,
 						0,
-						-btnCoordX,
-						-btnCoordY
+						-that.btnCoordX,
+						-that.btnCoordY
 					);
-					release.call( jqCtn[ 0 ] );
+					that.release.call( that.jqCtn[ 0 ] );
 				}
 			},
 			ev_move = function( e ) {
-				if ( isHolding ) {
+				if ( that.isHolding ) {
 					var
 						x, y, a, d, rx, ry,
 						pos = e
@@ -109,15 +113,15 @@
 						return;
 					}
 					e.preventDefault();
-					rx = pos.pageX - coordX;
-					ry = pos.pageY - coordY;
-					coordX = pos.pageX;
-					coordY = pos.pageY;
-					x = btnCoordX += rx;
-					y = btnCoordY += ry;
+					rx = pos.pageX - that.coordX;
+					ry = pos.pageY - that.coordY;
+					that.coordX = pos.pageX;
+					that.coordY = pos.pageY;
+					x = that.btnCoordX += rx;
+					y = that.btnCoordY += ry;
 					d = Math.sqrt( x * x + y * y );
-					if ( d > radius ) {
-						d = radius;
+					if ( d > that.radius ) {
+						d = that.radius;
 					}
 					a = Math.atan2( y, x );
 					moveBtn(
@@ -130,16 +134,16 @@
 			}
 		;
 
-		jqCtn.append( jqBtn );
+		this.jqCtn.append( this.jqBtn );
 
 		if ( isTactile ) {
-			jqCtn.on( "touchstart", ev_hold );
+			this.jqCtn.on( "touchstart", ev_hold );
 			jqWindow
 				.on( "touchend", ev_release )
 				.on( "touchmove", ev_move )
 			;
 		} else {
-			jqCtn.mousedown( ev_hold );
+			this.jqCtn.mousedown( ev_hold );
 			jqWindow
 				.mouseup( ev_release )
 				.mousemove( ev_move )
