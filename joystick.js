@@ -32,118 +32,119 @@
 		this.btnCoordX =
 		this.btnCoordY = 0;
 
-		var
-			that = this,
-			searchTouch = function( e ) {
-				var t, i = 0;
-				e = e.changedTouches;
-				for ( ; t = e[ i ]; ++i ) {
-					if ( t.identifier === that.identifier ) {
-						return t;
-					}
-				}
-			},
-			ev_hold = function( e ) {
-				var t, i = 0, pos = e;
-				if ( isTactile ) {
-					while ( t = e.changedTouches[ i++ ] ) {
-						if ( t.target === that.jqCtn[ 0 ] || t.target === that.jqBtn[ 0 ] ) {
-							break;
-						}
-					}
-					if ( !t ) {
-						return;
-					}
-					pos = t;
-					that.identifier = t.identifier;
-				}
-				that.btnCoordX = 0;
-				that.btnCoordY = 0;
-				e.preventDefault();
-				that.coordX = pos.pageX;
-				that.coordY = pos.pageY;
-				that.isHolding = true;
-				that.jqCtn
-					.removeClass( "joystick-reset" )
-					.addClass( "joystick-show" )
-				;
-				that.hold.call( that.jqCtn[ 0 ] );
-			},
-			moveBtn = function( x, y, rx, ry ) {
-				that.jqBtn.css({
-					marginLeft: x,
-					marginTop: y,
-				});
-				that.move.call(
-					that.jqCtn[ 0 ],
-					x / that.radius,
-					y / that.radius,
-					rx,
-					ry
-				);
-			},
-			ev_release = function( e ) {
-				if ( that.isHolding && ( !isTactile || searchTouch( e ) ) ) {
-					e.preventDefault();
-					that.isHolding = false;
-					that.jqCtn
-						.removeClass( "joystick-show" )
-						.addClass( "joystick-reset" )
-					;
-					that.jqBtn.css({
-						marginLeft: 0,
-						marginTop: 0
-					});
-					moveBtn(
-						0,
-						0,
-						-that.btnCoordX,
-						-that.btnCoordY
-					);
-					that.release.call( that.jqCtn[ 0 ] );
-				}
-			},
-			ev_move = function( e ) {
-				if ( that.isHolding ) {
-					var
-						x, y, a, d, rx, ry,
-						pos = e
-					;
-					if ( isTactile && !( pos = searchTouch( e ) ) ) {
-						return;
-					}
-					e.preventDefault();
-					rx = pos.pageX - that.coordX;
-					ry = pos.pageY - that.coordY;
-					that.coordX = pos.pageX;
-					that.coordY = pos.pageY;
-					x = that.btnCoordX += rx;
-					y = that.btnCoordY += ry;
-					d = Math.sqrt( x * x + y * y );
-					if ( d > that.radius ) {
-						d = that.radius;
-					}
-					a = Math.atan2( y, x );
-					moveBtn(
-						Math.cos( a ) * d,
-						Math.sin( a ) * d,
-						rx,
-						ry
-					);
-				}
-			}
-		;
+		var that = this;
 
 		this.jqCtn
 			.append( this.jqBtn )
-			.on( isTactile ? "touchstart" : "mousedown", ev_hold )
+			.on( isTactile ? "touchstart" : "mousedown", function( e ) { that.ev_hold( e ); } )
 		;
 
 		jqWindow
-			.on( isTactile ? "touchend" : "mouseup", ev_release )
-			.on( isTactile ? "touchmove" : "mousemove", ev_move )
+			.on( isTactile ? "touchend" : "mouseup", function( e ) { that.ev_release( e ); } )
+			.on( isTactile ? "touchmove" : "mousemove", function( e ) { that.ev_move( e ); } )
 		;
 
+	};
+
+	window.joystick.prototype = {
+		searchTouch: function( e ) {
+			var t, i = 0;
+			e = e.changedTouches;
+			for ( ; t = e[ i ]; ++i ) {
+				if ( t.identifier === this.identifier ) {
+					return t;
+				}
+			}
+		},
+		ev_hold: function( e ) {
+			var t, i = 0, pos = e;
+			if ( isTactile ) {
+				while ( t = e.changedTouches[ i++ ] ) {
+					if ( t.target === this.jqCtn[ 0 ] || t.target === this.jqBtn[ 0 ] ) {
+						break;
+					}
+				}
+				if ( !t ) {
+					return;
+				}
+				pos = t;
+				this.identifier = t.identifier;
+			}
+			this.btnCoordX = 0;
+			this.btnCoordY = 0;
+			e.preventDefault();
+			this.coordX = pos.pageX;
+			this.coordY = pos.pageY;
+			this.isHolding = true;
+			this.jqCtn
+				.removeClass( "joystick-reset" )
+				.addClass( "joystick-show" )
+			;
+			this.hold.call( this.jqCtn[ 0 ] );
+		},
+		moveBtn: function( x, y, rx, ry ) {
+			this.jqBtn.css({
+				marginLeft: x,
+				marginTop: y,
+			});
+			this.move.call(
+				this.jqCtn[ 0 ],
+				x / this.radius,
+				y / this.radius,
+				rx,
+				ry
+			);
+		},
+		ev_release: function( e ) {
+			if ( this.isHolding && ( !isTactile || searchTouch( e ) ) ) {
+				e.preventDefault();
+				this.isHolding = false;
+				this.jqCtn
+					.removeClass( "joystick-show" )
+					.addClass( "joystick-reset" )
+				;
+				this.jqBtn.css({
+					marginLeft: 0,
+					marginTop: 0
+				});
+				this.moveBtn(
+					0,
+					0,
+					-this.btnCoordX,
+					-this.btnCoordY
+				);
+				this.release.call( this.jqCtn[ 0 ] );
+			}
+		},
+		ev_move: function( e ) {
+			if ( this.isHolding ) {
+				var
+					x, y, a, d, rx, ry,
+					pos = e
+				;
+				if ( isTactile && !( pos = searchTouch( e ) ) ) {
+					return;
+				}
+				e.preventDefault();
+				rx = pos.pageX - this.coordX;
+				ry = pos.pageY - this.coordY;
+				this.coordX = pos.pageX;
+				this.coordY = pos.pageY;
+				x = this.btnCoordX += rx;
+				y = this.btnCoordY += ry;
+				d = Math.sqrt( x * x + y * y );
+				if ( d > this.radius ) {
+					d = this.radius;
+				}
+				a = Math.atan2( y, x );
+				this.moveBtn(
+					Math.cos( a ) * d,
+					Math.sin( a ) * d,
+					rx,
+					ry
+				);
+			}
+		}
 	};
 
 })();
