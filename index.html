@@ -1,71 +1,71 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Joystick - HTML5</title>
-	<meta charset="UTF-8"/>
-	<meta name="viewport" content="width=device-width, user-scalable=no"/>
-	<meta property="og:title"       content="Joystick - HTML5"/>
-	<meta property="og:url"         content="https://mr21.github.io/joystick-html5/"/>
-	<meta property="og:image"       content="https://mr21.github.io/joystick-html5/thumbnail.jpg"/>
-	<meta property="og:description" content="A tiny joystick for mobile purpose - 100% HTML5 without any dependency."/>
-	<link rel="stylesheet" href="/_/fa/css/font-awesome.min.css"/>
-	<link rel="stylesheet" href="/_/header.css"/>
-	<link rel="stylesheet" href="joystick.css"/>
-	<script src="/_/header.js"></script>
-	<script src="joystick.js"></script>
-	<style>
-		#container {
-			position: relative;
-			margin: 35px auto;
-			width: 450px;
-			height: 250px;
-			border-radius: 4px;
-			background: #222;
-			}
-		.side {
-			position: absolute;
-			bottom: 20px;
-			font-weight: bold;
-			}
-		.left  { color: #afa; left: 20px; }
-		.right { color: #aaf; right: 20px; }
-		.joystick {
-			margin-top: 25px;
-		}
-	</style>
-	<script>
-	window.onload = function() {
-
-		var el_dataSpan = document.querySelectorAll("#container .data");
-
-		function setCoord(x, y, rx, ry, side) {
-			function f(v, ind) {
-				var vs = v.toString();
-				vs = vs.substr(0, 4 + (vs[0] === "-"));
-				el_dataSpan[ind].textContent = vs;
-			}
-			f( x, 0 + side * 4);
-			f( y, 1 + side * 4);
-			f(rx, 2 + side * 4);
-			f(ry, 3 + side * 4);
-		}
-
-		new joystick({
-			element: document.querySelector(".left .joystick"),
-			move:    function(x, y, rx, ry) { setCoord(x, y, rx, ry, 0); },
-			hold:    function() { setCoord(0, 0, 0, 0, 0); },
-			release: function() { setCoord(0, 0, 0, 0, 0); }
-		});
-
-		new joystick({
-			element: document.querySelector(".right .joystick"),
-			move:    function(x, y, rx, ry) { setCoord(x, y, rx, ry, 1); },
-			hold:    function() { setCoord(0, 0, 0, 0, 1); },
-			release: function() { setCoord(0, 0, 0, 0, 1); }
-		});
-
+<title>joystick-html5</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, user-scalable=no"/>
+<meta property="og:title"       content="joystick-html5"/>
+<meta property="og:url"         content="https://mr21.github.io/joystick-html5/"/>
+<meta property="og:image"       content="https://mr21.github.io/joystick-html5/thumbnail.jpg"/>
+<meta property="og:description" content="A tiny HTML5 joystick for mobile purpose."/>
+<link rel="stylesheet" href="/_/fa/css/font-awesome.min.css"/>
+<link rel="stylesheet" href="/_/header.css"/>
+<link rel="stylesheet" href="joystick.css"/>
+<script src="/_/header.js"></script>
+<script src="joystick.js"></script>
+<style>
+#container {
+	position: relative;
+	margin: 35px auto;
+	width: 450px;
+	height: 250px;
+	border-radius: 4px;
+	background: #222;
 	}
-	</script>
+.side {
+	position: absolute;
+	bottom: 20px;
+	font-weight: bold;
+	}
+.left  { color: #afa; left: 20px; }
+.right { color: #aaf; right: 20px; }
+.joystick {
+	margin-top: 25px;
+	}
+</style>
+<script>
+window.onload = function() {
+
+	var elData = document.querySelectorAll( "#container span" );
+
+	function setCoord( x, y, rx, ry, side ) {
+
+		function f( v, ind ) {
+			elData[ ind ].textContent = ~~( v * 100 ) / 100;
+		}
+
+		f(  x, 0 + side * 4 );
+		f(  y, 1 + side * 4 );
+		f( rx, 2 + side * 4 );
+		f( ry, 3 + side * 4 );
+	}
+
+	new joystick({
+		element: document.querySelector( ".left .joystick" ),
+		move:    function( x, y, rx, ry ) { setCoord( x, y, rx, ry, 0 ); },
+		hold:    function() { setCoord( 0, 0, 0, 0, 0 ); },
+		release: function() { setCoord( 0, 0, 0, 0, 0 ); }
+	});
+
+	new joystick({
+		element: document.querySelector( ".right .joystick" ),
+		move:    function( x, y, rx, ry ) { setCoord( x, y, rx, ry, 1 ); },
+		hold:    function() { setCoord( 0, 0, 0, 0, 1 ); },
+		release: function() { setCoord (0, 0, 0, 0, 1 ); }
+	});
+
+}
+</script>
 </head>
 <body>
 
@@ -76,17 +76,17 @@
 
 	<div id="container">
 		<div class="side left">
-			x: <span class="data"></span><br/>
-			y: <span class="data"></span><br/>
-			rx: <span class="data"></span><br/>
-			ry: <span class="data"></span><br/>
+			x: <span></span><br/>
+			y: <span></span><br/>
+			rx: <span></span><br/>
+			ry: <span></span><br/>
 			<div class="joystick"></div>
 		</div>
 		<div class="side right">
-			x: <span class="data"></span><br/>
-			y: <span class="data"></span><br/>
-			rx: <span class="data"></span><br/>
-			ry: <span class="data"></span><br/>
+			x: <span></span><br/>
+			y: <span></span><br/>
+			rx: <span></span><br/>
+			ry: <span></span><br/>
 			<div class="joystick"></div>
 		</div>
 	</div>
