@@ -10,17 +10,26 @@
 	var
 		joystickCurrent,
 		jqWindow = $( window ),
-		onDesktop = !( "ontouchstart" in document.documentElement )
+		onDesktop = areWeOnDesktop()
 	;
 
+	function areWeOnDesktop() {
+		try {
+			document.createEvent( "TouchEvent" );
+			return false;
+		} catch ( e ) {
+			return true;
+		}
+	}
+
 	function winMove( e ) {
-		var joy, t;
+		var joy, t, i = 0;
 		if ( joystickCurrent ) {
 			e.preventDefault();
 			if ( onDesktop ) {
 				joystickCurrent.move( e.pageX, e.pageY );
 			} else {
-				e = e.changedTouches;
+				e = e.originalEvent.changedTouches;
 				while ( t = e[ i++ ] ) {
 					if ( joy = joystickCurrent[ t.identifier ] ) {
 						joy.move( t.pageX, t.pageY );
@@ -31,14 +40,14 @@
 	}
 
 	function winRelease( e ) {
-		var joy, t;
+		var joy, t, i = 0;
 		if ( joystickCurrent ) {
 			e.preventDefault();
 			if ( onDesktop ) {
 				joystickCurrent.release();
 				joystickCurrent = null;
 			} else {
-				e = e.changedTouches;
+				e = e.originalEvent.changedTouches;
 				while ( t = e[ i++ ] ) {
 					if ( joy = joystickCurrent[ t.identifier ] ) {
 						joy.release();
@@ -86,6 +95,7 @@
 				if ( onDesktop ) {
 					joystickCurrent = that;
 				} else {
+					e = e.originalEvent;
 					while ( t = e.changedTouches[ i++ ] ) {
 						if ( t.target === that.jqCtn[ 0 ] || t.target === that.jqBtn[ 0 ] ) {
 							break;
@@ -96,6 +106,7 @@
 					}
 					pos = t;
 					that.identifier = t.identifier;
+					joystickCurrent = joystickCurrent || [];
 					joystickCurrent[ t.identifier ] = that;
 				}
 				e.preventDefault();
