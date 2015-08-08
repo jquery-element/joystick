@@ -10,14 +10,14 @@
 	var
 		joystickCurrent,
 		jqWindow = $( window ),
-		isTactile = window.ontouchstart === null
+		onDesktop = !( "ontouchstart" in document.documentElement )
 	;
 
 	function winMove( e ) {
 		var joy, t;
 		if ( joystickCurrent ) {
 			e.preventDefault();
-			if ( !isTactile ) {
+			if ( onDesktop ) {
 				joystickCurrent.move( e.pageX, e.pageY );
 			} else {
 				e = e.changedTouches;
@@ -34,7 +34,7 @@
 		var joy, t;
 		if ( joystickCurrent ) {
 			e.preventDefault();
-			if ( !isTactile ) {
+			if ( onDesktop ) {
 				joystickCurrent.release();
 				joystickCurrent = null;
 			} else {
@@ -53,8 +53,8 @@
 	}
 
 	jqWindow
-		.on( isTactile ? "touchmove" : "mousemove", winMove )
-		.on( isTactile ? "touchend" : "mouseup", winRelease )
+		.on( onDesktop ? "mousemove" : "touchmove", winMove )
+		.on( onDesktop ? "mouseup" : "touchend", winRelease )
 	;
 
 	window.joystick = function( p ) {
@@ -81,9 +81,9 @@
 
 		this.jqCtn
 			.append( this.jqBtn )
-			.on( isTactile ? "touchstart" : "mousedown", function( e ) {
+			.on( onDesktop ? "mousedown" : "touchstart", function( e ) {
 				var t, i = 0, pos = e;
-				if ( !isTactile ) {
+				if ( onDesktop ) {
 					joystickCurrent = that;
 				} else {
 					while ( t = e.changedTouches[ i++ ] ) {
