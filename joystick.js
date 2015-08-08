@@ -1,5 +1,5 @@
 /*
-	Joystick-HTML5 - 1.1.0
+	Joystick-HTML5 - 2.0.0
 	https://github.com/Mr21/joystick-html5
 */
 
@@ -8,8 +8,53 @@
 (function() {
 
 	var
+		joystickCurrent,
 		jqWindow = $( window ),
 		isTactile = window.ontouchstart === null
+	;
+
+	function winMove( e ) {
+		var joy, t;
+		if ( joystickCurrent ) {
+			e.preventDefault();
+			if ( !isTactile ) {
+				joystickCurrent.move( e.pageX, e.pageY );
+			} else {
+				e = e.changedTouches;
+				while ( t = e[ i++ ] ) {
+					if ( joy = joystickCurrent[ t.identifier ] ) {
+						joy.move( t.pageX, t.pageY );
+					}
+				}
+			}
+		}
+	}
+
+	function winRelease( e ) {
+		var joy, t;
+		if ( joystickCurrent ) {
+			e.preventDefault();
+			if ( !isTactile ) {
+				joystickCurrent.release();
+				joystickCurrent = null;
+			} else {
+				e = e.changedTouches;
+				while ( t = e[ i++ ] ) {
+					if ( joy = joystickCurrent[ t.identifier ] ) {
+						joy.release();
+						delete joystickCurrent[ t.identifier ];
+					}
+				}
+				if ( $.isEmptyObject( joystickCurrent ) ) {
+					joystickCurrent = null;
+				}
+			}
+		}
+	}
+
+	jqWindow
+		.on( isTactile ? "touchmove" : "mousemove", winMove )
+		.on( isTactile ? "touchend" : "mouseup", winRelease )
 	;
 
 	window.joystick = function( p ) {
@@ -36,23 +81,39 @@
 
 		this.jqCtn
 			.append( this.jqBtn )
-			.on( isTactile ? "touchstart" : "mousedown", function( e ) { that.ev_hold( e ); } )
+			.on( isTactile ? "touchstart" : "mousedown", function( e ) {
+				var t, i = 0, pos = e;
+				if ( !isTactile ) {
+					joystickCurrent = that;
+				} else {
+					while ( t = e.changedTouches[ i++ ] ) {
+						if ( t.target === that.jqCtn[ 0 ] || t.target === that.jqBtn[ 0 ] ) {
+							break;
+						}
+					}
+					if ( !t ) {
+						return;
+					}
+					pos = t;
+					that.identifier = t.identifier;
+					joystickCurrent[ t.identifier ] = that;
+				}
+				e.preventDefault();
+				that.click(
+					pos.pageX,
+					pos.pageY
+				);
+			})
 		;
-
-		jqWindow
-			.on( isTactile ? "touchend" : "mouseup", function( e ) { that.ev_release( e ); } )
-			.on( isTactile ? "touchmove" : "mousemove", function( e ) { that.ev_move( e ); } )
-		;
-
 	};
 
 	window.joystick.prototype = {
 		click: function( x, y ) {
+			this.isHolding = true;
 			this.btnCoordX =
 			this.btnCoordY = 0;
 			this.coordX = x;
 			this.coordY = y;
-			this.isHolding = true;
 			this.jqCtn
 				.removeClass( "joystick-reset" )
 				.addClass( "joystick-show" )
@@ -99,57 +160,6 @@
 				-this.btnCoordY
 			);
 			this.cbRelease.call( this.jqCtn[ 0 ] );
-		},
-
-
-
-		searchTouch: function( e ) {
-			var t, i = 0;
-			e = e.changedTouches;
-			for ( ; t = e[ i ]; ++i ) {
-				if ( t.identifier === this.identifier ) {
-					return t;
-				}
-			}
-		},
-		ev_hold: function( e ) {
-			var t, i = 0, pos = e;
-			if ( isTactile ) {
-				while ( t = e.changedTouches[ i++ ] ) {
-					if ( t.target === this.jqCtn[ 0 ] || t.target === this.jqBtn[ 0 ] ) {
-						break;
-					}
-				}
-				if ( !t ) {
-					return;
-				}
-				pos = t;
-				this.identifier = t.identifier;
-			}
-			e.preventDefault();
-			this.click(
-				pos.pageX,
-				pos.pageY
-			);
-		},
-		ev_release: function( e ) {
-			if ( this.isHolding && ( !isTactile || searchTouch( e ) ) ) {
-				e.preventDefault();
-				this.release();
-			}
-		},
-		ev_move: function( e ) {
-			if ( this.isHolding ) {
-				var pos = e;
-				if ( isTactile && !( pos = searchTouch( e ) ) ) {
-					return;
-				}
-				e.preventDefault();
-				this.move(
-					pos.pageX,
-					pos.pageY
-				);
-			}
 		}
 	};
 
