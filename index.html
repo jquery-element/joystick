@@ -10,9 +10,9 @@
 <meta property="og:description" content="A tiny HTML5 joystick for mobile purpose."/>
 <link rel="stylesheet" href="/_/fa/css/font-awesome.min.css"/>
 <link rel="stylesheet" href="/_/header.css"/>
-<link rel="stylesheet" href="joystick.css"/>
 <script src="/_/header.js"></script>
 <script src="/_/jquery.js"></script>
+<script src="/jquery-element/jquery-element.js"></script>
 <script src="joystick.js"></script>
 <style>
 #container {
@@ -35,37 +35,32 @@
 	}
 </style>
 <script>
-window.onload = function() {
+$( function() {
 
-	var elData = document.querySelectorAll( "#container span" );
+	var jqData = $( "#container span" );
 
 	function setCoord( x, y, rx, ry, side ) {
-
-		function f( v, ind ) {
-			elData[ ind ].textContent = ~~( v * 100 ) / 100;
+		function f( ind, v ) {
+			jqData.eq( ind ).text( ~~( v * 100 ) / 100 );
 		}
-
-		f(  x, 0 + side * 4 );
-		f(  y, 1 + side * 4 );
-		f( rx, 2 + side * 4 );
-		f( ry, 3 + side * 4 );
+		f( 0 + side * 4,  x );
+		f( 1 + side * 4,  y );
+		f( 2 + side * 4, rx );
+		f( 3 + side * 4, ry );
 	}
 
-	new joystick({
-		element: document.querySelector( ".left .joystick" ),
+	$( ".left .joystick" ).element().init({
 		move:    function( x, y, rx, ry ) { setCoord( x, y, rx, ry, 0 ); },
 		hold:    function() { setCoord( 0, 0, 0, 0, 0 ); },
 		release: function() { setCoord( 0, 0, 0, 0, 0 ); }
 	});
 
-	new joystick({
-		element: document.querySelector( ".right .joystick" ),
+	$( ".right .joystick" ).element().init({
 		move:    function( x, y, rx, ry ) { setCoord( x, y, rx, ry, 1 ); },
 		hold:    function() { setCoord( 0, 0, 0, 0, 1 ); },
-		release: function() { setCoord (0, 0, 0, 0, 1 ); }
+		release: function() { setCoord( 0, 0, 0, 0, 1 ); }
 	});
-
-}
+});
 </script>
 </head>
 <body>
@@ -81,14 +76,14 @@ window.onload = function() {
 			y: <span></span><br/>
 			rx: <span></span><br/>
 			ry: <span></span><br/>
-			<div class="joystick"></div>
+			<div data-jquery-element="joystick"></div>
 		</div>
 		<div class="side right">
 			x: <span></span><br/>
 			y: <span></span><br/>
 			rx: <span></span><br/>
 			ry: <span></span><br/>
-			<div class="joystick"></div>
+			<div data-jquery-element="joystick"></div>
 		</div>
 	</div>
 
