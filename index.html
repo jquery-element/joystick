@@ -11,8 +11,8 @@
 <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css"/>
 <link rel="stylesheet" href="https://mr21.github.io/_/header.css"/>
 <script src="//code.jquery.com/jquery-3.0.0-alpha1.min.js"></script>
-<script src="../dist/jquery-element-1.7.0.js"></script>
-<script src="https://mr21.github.io/_/header.js"></script>
+<script src="//jquery-element.github.io/jquery-element-1.7.0.js"></script>
+<script src="//mr21.github.io/_/header.js"></script>
 <script src="joystick.js"></script>
 <style>
 #container {
@@ -39,26 +39,27 @@ $( function() {
 
 	var jqData = $( "#container span" );
 
-	function setCoord( x, y, rx, ry, side ) {
+	function setCoord( side, x, y, rx, ry ) {
 		function f( ind, v ) {
 			jqData.eq( ind ).text( ~~( v * 100 ) / 100 );
 		}
-		f( 0 + side * 4,  x );
-		f( 1 + side * 4,  y );
-		f( 2 + side * 4, rx );
-		f( 3 + side * 4, ry );
+		side *= 4;
+		f( side + 0,  x );
+		f( side + 1,  y );
+		f( side + 2, rx );
+		f( side + 3, ry );
 	}
 
 	$( ".left .joystick" ).element().init({
-		move:    function( x, y, rx, ry ) { setCoord( x, y, rx, ry, 0 ); },
-		hold:    function() { setCoord( 0, 0, 0, 0, 0 ); },
-		release: function() { setCoord( 0, 0, 0, 0, 0 ); }
+		move:    setCoord.bind( null, 0 ),
+		hold:    setCoord.bind( null, 0, 0, 0, 0, 0 ),
+		release: setCoord.bind( null, 0, 0, 0, 0, 0 )
 	});
 
 	$( ".right .joystick" ).element().init({
-		move:    function( x, y, rx, ry ) { setCoord( x, y, rx, ry, 1 ); },
-		hold:    function() { setCoord( 0, 0, 0, 0, 1 ); },
-		release: function() { setCoord( 0, 0, 0, 0, 1 ); }
+		move:    setCoord.bind( null, 1 ),
+		hold:    setCoord.bind( null, 1, 0, 0, 0, 0 ),
+		release: setCoord.bind( null, 1, 0, 0, 0, 0 )
 	});
 });
 </script>
