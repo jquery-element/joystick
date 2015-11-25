@@ -1,63 +1,61 @@
 /*
-	Joystick-HTML5 - 2.0.0
-	https://github.com/Mr21/joystick-html5
+	joystick - 2.1.0
+	https://github.com/jquery-element/joystick
 */
 
-(function( $ ) {
+( function( $ ) {
 
 "use strict";
 
 var
-	joystickCurrent,
+	currentJoysticks,
 	jqWindow = $( window ),
-	onDesktop = areWeOnDesktop()
+	onDesktop = ( function() {
+		try {
+			document.createEvent( "TouchEvent" );
+			return false;
+		} catch ( e ) {
+			return true;
+		}
+	})()
 ;
-
-function areWeOnDesktop() {
-	try {
-		document.createEvent( "TouchEvent" );
-		return false;
-	} catch ( e ) {
-		return true;
-	}
-}
 
 function winMove( e ) {
 	var joy, t, i = 0;
-	if ( joystickCurrent ) {
-		e.preventDefault();
+	if ( currentJoysticks ) {
 		if ( onDesktop ) {
-			joystickCurrent.move( e.pageX, e.pageY );
+			currentJoysticks.move( e.pageX, e.pageY );
 		} else {
 			e = e.originalEvent.changedTouches;
 			while ( t = e[ i++ ] ) {
-				if ( joy = joystickCurrent[ t.identifier ] ) {
+				if ( joy = currentJoysticks[ t.identifier ] ) {
 					joy.move( t.pageX, t.pageY );
 				}
 			}
 		}
+		return false;
 	}
 }
 
 function winRelease( e ) {
 	var joy, t, i = 0;
-	if ( joystickCurrent ) {
-		e.preventDefault();
+	if ( currentJoysticks ) {
 		if ( onDesktop ) {
-			joystickCurrent.release();
-			joystickCurrent = null;
+			currentJoysticks.release();
+			currentJoysticks = null;
 		} else {
 			e = e.originalEvent.changedTouches;
 			while ( t = e[ i++ ] ) {
-				if ( joy = joystickCurrent[ t.identifier ] ) {
+				if ( joy = currentJoysticks[ t.identifier ] ) {
 					joy.release();
-					delete joystickCurrent[ t.identifier ];
+					delete currentJoysticks[ t.identifier ];
 				}
 			}
-			if ( $.isEmptyObject( joystickCurrent ) ) {
-				joystickCurrent = null;
+			if ( $.isEmptyObject( currentJoysticks ) ) {
+				currentJoysticks = null;
 			}
 		}
+		return false;
 	}
 }
 
@@ -124,22 +122,19 @@ $.element({
 	init: function() {
 
 		// First, initialize all the user's callback.
-		this.init({});
+		this.init( {} );
 
 		// This is the bouton inside the joystick himself.
 		// this.jqElement IS the joystick himself (the container).
 		this.jqBtn =
-			this.jqElement
-				.addClass( "joystick" )
-				.children()
-			;
+		this.jqElement
+			.addClass( "joystick" )
+			.children()
+		;
 
 		// Attributes.
 		this.radius = this.jqElement.width() / 2;
 		this.isHolding = false;
-		this.identifier;
-		this.coordX;
-		this.coordY;
 		this.btnCoordX =
 		this.btnCoordY = 0;
 
@@ -147,12 +142,17 @@ $.element({
 
 		this.jqElement
 			.on( onDesktop ? "mousedown" : "touchstart", function( e ) {
-				var t, i = 0, pos = e;
+				var
+					t, touches,
+					i = 0,
+					pos = e
+				;
+
 				if ( onDesktop ) {
-					joystickCurrent = that;
+					currentJoysticks = that;
 				} else {
-					e = e.originalEvent;
-					while ( t = e.changedTouches[ i++ ] ) {
+					touches = e.originalEvent.changedTouches;
+					while ( t = touches[ i++ ] ) {
 						if ( t.target === that.jqElement[ 0 ] || t.target === that.jqBtn[ 0 ] ) {
 							break;
 						}
@@ -161,15 +161,14 @@ $.element({
 						return;
 					}
 					pos = t;
-					that.identifier = t.identifier;
-					joystickCurrent = joystickCurrent || [];
-					joystickCurrent[ t.identifier ] = that;
+					currentJoysticks = currentJoysticks || {};
+					currentJoysticks[ t.identifier ] = that;
 				}
-				e.preventDefault();
 				that.click(
 					pos.pageX,
 					pos.pageY
 				);
+				return false;
 			})
 		;
 	},
