@@ -1,91 +1,84 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>joystick-html5</title>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, user-scalable=no"/>
-<meta property="og:title"       content="joystick-html5"/>
-<meta property="og:url"         content="http://jquery-element.github.io/joystick-html5/"/>
-<meta property="og:image"       content="http://jquery-element.github.io/joystick-html5/thumbnail.jpg"/>
-<meta property="og:description" content="A tiny HTML5 joystick for mobile purpose."/>
-<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css"/>
-<link rel="stylesheet" href="https://mr21.github.io/_/header.css"/>
-<script src="//code.jquery.com/jquery-3.0.0-alpha1.min.js"></script>
-<script src="//jquery-element.github.io/jquery-element-1.7.0.js"></script>
-<script src="//mr21.github.io/_/header.js"></script>
-<script src="joystick.js"></script>
-<style>
-#container {
-	position: relative;
-	margin: 35px auto;
-	width: 450px;
-	height: 250px;
-	border-radius: 4px;
-	background: #222;
+	<title>joystick</title>
+	<meta charset="UTF-8"/>
+	<meta name="viewport" content="width=device-width, user-scalable=no"/>
+	<meta property="og:title"       content="joystick"/>
+	<meta property="og:url"         content="http://jquery-element.github.io/joystick/"/>
+	<meta property="og:image"       content="http://jquery-element.github.io/joystick/thumbnail.jpg"/>
+	<meta property="og:description" content="A tiny HTML5 joystick for mobile purpose."/>
+	<script src="//code.jquery.com/jquery-3.0.0-alpha1.min.js"></script>
+	<script src="//jquery-element.github.io/jquery-element-1.7.0.js"></script>
+	<script src="//jquery-element.github.io/joystick-2.0.0.js"></script>
+	<style>
+	body {
+		margin-top: 35px;
+		font: 16px monospace;
+		text-align: center;
+		color: #afa;
+		background: #222;
 	}
-.side {
-	position: absolute;
-	bottom: 20px;
-	font-weight: bold;
+	.side {
+		display: inline-block;
+		text-align: left;
 	}
-.left  { color: #afa; left: 20px; }
-.right { color: #aaf; right: 20px; }
-.joystick {
-	margin-top: 25px;
+	.joystick {
+		margin-top: 25px;
 	}
-</style>
-<script>
-$( function() {
+	.right {
+		color: #aaf;
+		margin-left: 200px;
+	}
+	</style>
+	<script>
+	$( function() {
 
-	var jqData = $( "#container span" );
+		var jqData = $( "span" );
 
-	function setCoord( side, x, y, rx, ry ) {
-		function f( ind, v ) {
-			jqData.eq( ind ).text( ~~( v * 100 ) / 100 );
+		function setCoord( side, x, y, rx, ry ) {
+			side *= 4;
+			function f( ind, v ) {
+				jqData.eq( side + ind ).text( ~~( v * 100 ) / 100 );
+			}
+			f( 0,  x );
+			f( 1,  y );
+			f( 2, rx );
+			f( 3, ry );
 		}
-		side *= 4;
-		f( side + 0,  x );
-		f( side + 1,  y );
-		f( side + 2, rx );
-		f( side + 3, ry );
-	}
 
-	$( ".left .joystick" ).element().init({
-		move:    setCoord.bind( null, 0 ),
-		hold:    setCoord.bind( null, 0, 0, 0, 0, 0 ),
-		release: setCoord.bind( null, 0, 0, 0, 0, 0 )
-	});
+		setCoord( 0, 0, 0, 0, 0 );
+		setCoord( 1, 0, 0, 0, 0 );
 
-	$( ".right .joystick" ).element().init({
-		move:    setCoord.bind( null, 1 ),
-		hold:    setCoord.bind( null, 1, 0, 0, 0, 0 ),
-		release: setCoord.bind( null, 1, 0, 0, 0, 0 )
+		$( ".left .joystick" ).element().init({
+			move:    setCoord.bind( null, 0 ),
+			hold:    setCoord.bind( null, 0, 0, 0, 0, 0 ),
+			release: setCoord.bind( null, 0, 0, 0, 0, 0 )
+		});
+
+		$( ".right .joystick" ).element().init({
+			move:    setCoord.bind( null, 1 ),
+			hold:    setCoord.bind( null, 1, 0, 0, 0, 0 ),
+			release: setCoord.bind( null, 1, 0, 0, 0, 0 )
+		});
 	});
-});
-</script>
+	</script>
 </head>
 <body>
 
-	<div id="header">
-		<i class="fa fa-fw fa-gamepad"></i>
-		<h1>joystick-html5</h1>
-	</div>
-
-	<div id="container">
-		<div class="side left">
-			x: <span></span><br/>
-			y: <span></span><br/>
-			rx: <span></span><br/>
-			ry: <span></span><br/>
-			<div data-jquery-element="joystick"></div>
-		</div>
-		<div class="side right">
-			x: <span></span><br/>
-			y: <span></span><br/>
-			rx: <span></span><br/>
-			ry: <span></span><br/>
-			<div data-jquery-element="joystick"></div>
-		</div>
+	<div class="side left">
+		x &nbsp;: <span></span><br/>
+		y &nbsp;: <span></span><br/>
+		rx : <span></span><br/>
+		ry : <span></span><br/>
+		<div data-jquery-element="joystick"></div>
+	</div
+	><div class="side right">
+		x &nbsp;: <span></span><br/>
+		y &nbsp;: <span></span><br/>
+		rx : <span></span><br/>
+		ry : <span></span><br/>
+		<div data-jquery-element="joystick"></div>
 	</div>
 
 </body>
